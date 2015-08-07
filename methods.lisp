@@ -24,4 +24,37 @@
 (in-package :cl-cat)
 
 ;;; Generic and concrete inner-category methods.
+;;; FIXME: Choose a proper name...
 
+(defgeneric =-generic (category class a b)
+  (:documentation
+   "Generic function of =."))
+
+(defgeneric >-generic (category class a b)
+  (:documentation
+   "Generic function of >."))
+
+(defgeneric <-generic (category class a b)
+  (:documentation
+   "Generic function of <."))
+
+(defgeneric +-generic (category class a b)
+  (:documentation
+   "Generic function of +."))
+
+(defgeneric succ-generic (category class a b)
+  (:documentation
+   "Generic function of successor."))
+
+(defgeneric pred-generic (category class a b)
+  (:documentation
+   "Generic function of predecessor."))
+
+(defgeneric functor-generic (category class a b)
+  (:documentation
+   "Generic functor."))
+
+;;; And concrete methods apply to built-in class-category.
+;;; FIXME: Shall we do this? Let users define them!
+(defmethod =-generic ((category =-category) (class array) a b)
+  )

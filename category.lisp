@@ -31,6 +31,18 @@
 ;;; to re-define the category of this class and make the relationship exact.
 ;;; FIXME: Maybe we can do better?
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defstruct (class-category
+	       (:print-function
+		(lambda (cc s k)
+		  (declare (ignore k))
+		  (format s "<Type ~A of category ~A>"
+			  (class-category-class cc)
+			  (class-category-category cc)))))
+    (class t)
+    ;; CATEGORY will be a subclass of NONE-CATEGORY.
+    (category 'none-category)))
+
 ;;; DEFCATEGORY macro, will define the corresponding class of category and
 ;;; if given related function, initialize with given function, or just use
 ;;; slot-wise lexicographic default function.

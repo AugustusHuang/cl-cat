@@ -112,6 +112,8 @@
   (:documentation
    "A category with function to add together two objects, the sum of which is also an valid object in this category."))
 
+;;; FIXME: How about --categories? Add zero divisors and we are done?
+
 ;;; An object's successor must be > than this object, and an object has only
 ;;; one successor, but the counting step is not specified.
 (defclass succ-category (order-category)
