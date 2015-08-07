@@ -36,12 +36,13 @@
 	       (:print-function
 		(lambda (cc s k)
 		  (declare (ignore k))
-		  (format s "<Type ~A of category ~A>"
+		  (format s "<Class ~A of category ~A>"
 			  (class-category-class cc)
 			  (class-category-category cc)))))
-    (class t)
-    ;; CATEGORY will be a subclass of NONE-CATEGORY.
-    (category 'none-category)))
+    ;; CLASS will be a class-object.
+    (class (find-class t))
+    ;; CATEGORY will be an object of subclass of NONE-CATEGORY.
+    (category (make-instance 'none-category))))
 
 ;;; DEFCATEGORY macro, will define the corresponding class of category and
 ;;; if given related function, initialize with given function, or just use
