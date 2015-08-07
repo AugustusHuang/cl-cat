@@ -67,21 +67,24 @@
 ;;; Not exactly, but all two objects in this category can be compared with
 ;;; =-FUNCTION.
 (defclass =-category (none-category)
-  ((=-function :allocation :class
-	       :initarg :=-function))
+  ((=-function
+    :initarg :=-function
+    :reader =-function))
   (:documentation
    "A category with function to test whether two objects are = or not."))
 
 ;;; >-CATEGORY and <-CATEGORY act like =-CATEGORY...
 (defclass >-category (none-category)
-  ((>-function :allocation :class
-	       :initarg :>-function))
+  ((>-function
+    :initarg :>-function
+    :reader >-function))
   (:documentation
    "A category with function to test whether an object is > than another."))
 
 (defclass <-category (none-category)
-  ((<-function :allocation :class
-	       :initarg :<-function))
+  ((<-function
+    :initarg :<-function
+    :reader <-function))
   (:documentation
    "A category with function to test whether an object is < than another."))
 
@@ -96,39 +99,48 @@
 ;;;                                   |
 ;;;                              A ---+--- B
 (defclass +-category (none-category)
-  ((+-function :allocation :class
-	       :initarg :+-function)
+  ((+-function
+    :initarg :+-function
+    :reader +-function)
    ;; If the ADD function operate on a finite field (or interval) ...
-   (negative-infinitum :allocation :class
-		       :initarg :n-infinitum)
-   (positive-infinitum :allocation :class
-		       :initarg :p-infinitum))
+   (negative-infinitum
+    :initarg :n-infinitum
+    :reader negative-infinitum)
+   (positive-infinitum
+    :initarg :p-infinitum
+    :reader positive-infinitum))
   (:documentation
    "A category with function to add together two objects, the sum of which is also an valid object in this category."))
 
 ;;; An object's successor must be > than this object, and an object has only
 ;;; one successor, but the counting step is not specified.
-(defclass suc-category (order-category)
-  ((suc-function :allocation :class
-		 :initarg :suc-function)
-   (infinitum :allocation :class
-	      :initarg :infinitum))
+(defclass succ-category (order-category)
+  ((succ-function
+    :initarg :succ-function
+    :reader succ)
+   (infinitum
+    :initarg :infinitum
+    :reader infinitum))
   (:documentation
    "A category with function to get an object's successor, which is also a valid object in this category."))
 
-(defclass pre-category (order-category)
-  ((pre-function :allocation :class
-		 :initarg :pre-function)
-   (infinitum :allocation :class
-	      :initarg :infinitum))
+(defclass pred-category (order-category)
+  ((pred-function
+    :initarg :pred-function
+    :reader pred)
+   (infinitum
+    :initarg :infinitum
+    :reader infinitum))
   (:documentation
    "A category with function to get an object's predecessor, which is also a valid object in this category."))
 
 (defclass functor-category (none-category)
-  ((domain-category :allocation :class
-		    :initarg :domain)
-   (codomain-category :allocation :class
-		      :initarg :codomain))
+  ((domain-category
+    :initarg :domain
+    :reader domain)
+   (codomain-category
+    :initarg :codomain
+    :reader codomain))
   (:documentation
    "A category made up with functors map functions in one category to functions in another."))
 
@@ -157,12 +169,12 @@
   (:documentation
    "A functor category in which the sum of functors is also a functor in this category."))
 
-(defclass suc-functor-category (functor-category suc-category)
+(defclass succ-functor-category (functor-category succ-category)
   ()
   (:documentation
    "A functor category in which functors have their successors."))
 
-(defclass pre-functor-category (functor-category pre-category)
+(defclass pred-functor-category (functor-category pred-category)
   ()
   (:documentation
    "A functor category in which functors have their predecessors."))

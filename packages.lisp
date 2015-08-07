@@ -26,4 +26,24 @@
   (:documentation
    "Category level abstraction of Common Lisp.")
   (:export
-   ))
+   :none-category
+   :=-category
+   :>-category
+   :<-category
+   :+-category
+   :succ-category
+   :pred-category
+   :functor-category
+   :=-functor-category
+   :>-functor-category
+   :<-functor-category
+   :+-functor-category
+   :succ-functor-category
+   :pred-functor-category
+   :defcategory))
+
+(defpackage :cl-cat-test
+  (:use :cl
+	:cl-cat)
+  (:documentation
+   "Test functions and definitions of CL-CAT."))

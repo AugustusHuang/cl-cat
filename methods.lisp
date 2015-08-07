@@ -24,3 +24,4 @@
 (in-package :cl-cat)
 
 ;;; Generic and concrete inner-category methods.
+
