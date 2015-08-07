@@ -55,7 +55,8 @@
 ;;; Where A..F have no interactions. (Our basic way to make instances acts
 ;;; like this!)
 (defclass none-category () ()
-  (:documentation "A basic category with no inner functions at all."))
+  (:documentation
+   "A basic category with no inner functions at all."))
 
 ;;; =-CATEGORY graph looks like
 ;;; +----------------------------+
@@ -68,23 +69,26 @@
 (defclass =-category (none-category)
   ((=-function :allocation :class
 	       :initarg :=-function))
-  (:documentation "A category with function to test whether two objects are = or not."))
+  (:documentation
+   "A category with function to test whether two objects are = or not."))
 
 ;;; >-CATEGORY and <-CATEGORY act like =-CATEGORY...
 (defclass >-category (none-category)
   ((>-function :allocation :class
 	       :initarg :>-function))
-  (:documentation "A category with function to test whether an object is > than another."))
+  (:documentation
+   "A category with function to test whether an object is > than another."))
 
 (defclass <-category (none-category)
   ((<-function :allocation :class
 	       :initarg :<-function))
-  (:documentation "A category with function to test whether an object is < than another."))
+  (:documentation
+   "A category with function to test whether an object is < than another."))
 
 (defclass order-category (=-category >-category <-category)
   ()
-  (:documentation "A category with function to test whether an object =, > or <
-with another object. Only one will be true. (So it's total ordered.)."))
+  (:documentation
+   "A category with function to test whether an object =, > or < with another object. Only one will be true. (So it's total ordered.)."))
 
 ;;; Here the '+' means general '+', even '*' can be interpreted as '+',
 ;;; it's only a 2-to-1 operad... Like C
@@ -99,7 +103,8 @@ with another object. Only one will be true. (So it's total ordered.)."))
 		       :initarg :n-infinitum)
    (positive-infinitum :allocation :class
 		       :initarg :p-infinitum))
-  (:documentation "A category with function to add together two objects, the sum of which is also an valid object in this category."))
+  (:documentation
+   "A category with function to add together two objects, the sum of which is also an valid object in this category."))
 
 ;;; An object's successor must be > than this object, and an object has only
 ;;; one successor, but the counting step is not specified.
@@ -108,11 +113,57 @@ with another object. Only one will be true. (So it's total ordered.)."))
 		 :initarg :suc-function)
    (infinitum :allocation :class
 	      :initarg :infinitum))
-  (:documentation "A category with function to get an object's successor, which is also a valid object in this category."))
+  (:documentation
+   "A category with function to get an object's successor, which is also a valid object in this category."))
 
 (defclass pre-category (order-category)
   ((pre-function :allocation :class
 		 :initarg :pre-function)
    (infinitum :allocation :class
 	      :initarg :infinitum))
-  (:documentation "A category with function to get an object's predecessor, which is also a valid object in this category."))
+  (:documentation
+   "A category with function to get an object's predecessor, which is also a valid object in this category."))
+
+(defclass functor-category (none-category)
+  ((domain-category :allocation :class
+		    :initarg :domain)
+   (codomain-category :allocation :class
+		      :initarg :codomain))
+  (:documentation
+   "A category made up with functors map functions in one category to functions in another."))
+
+(defclass =-functor-category (functor-category =-category)
+  ()
+  (:documentation
+   "A functor category in which functors have natural isomorphism to themselves."))
+
+(defclass >-functor-category (functor-category >-category)
+  ()
+  (:documentation
+   "A functor category in which functors can be compared by >."))
+
+(defclass <-functor-category (functor-category <-category)
+  ()
+  (:documentation
+   "A functor category in which functors can be compared by <."))
+
+(defclass order-functor-category (functor-category order-category)
+  ()
+  (:documentation
+   "A functor category in which functors can be total-ordered."))
+
+(defclass +-functor-category (functor-category +-category)
+  ()
+  (:documentation
+   "A functor category in which the sum of functors is also a functor in this category."))
+
+(defclass suc-functor-category (functor-category suc-category)
+  ()
+  (:documentation
+   "A functor category in which functors have their successors."))
+
+(defclass pre-functor-category (functor-category pre-category)
+  ()
+  (:documentation
+   "A functor category in which functors have their predecessors."))
+
