@@ -54,7 +54,3 @@
   (:documentation
    "Generic functor."))
 
-;;; And concrete methods apply to built-in class-category.
-;;; FIXME: Shall we do this? Let users define them!
-(defmethod =-generic ((category =-category) (class array) a b)
-  )

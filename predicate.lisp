@@ -39,43 +39,49 @@
 		 pred-functor-category-p))
 
 (defun none-category-p (cc)
-  (typep (class-category-category cc) 'none-category))
+  (typep (cc-category cc) 'none-category))
 
 (defun =-category-p (cc)
-  (typep (class-category-category cc) '=-category))
+  (typep (cc-category cc) '=-category))
 
 (defun >-category-p (cc)
-  (typep (class-category-category cc) '>-category))
+  (typep (cc-category cc) '>-category))
 
 (defun <-category-p (cc)
-  (typep (class-category-category cc) '<-category))
+  (typep (cc-category cc) '<-category))
+
+(defun order-category-p (cc)
+  (typep (cc-category cc) 'order-category))
 
 (defun +-category-p (cc)
-  (typep (class-category-category cc) '+-category))
+  (typep (cc-category cc) '+-category))
 
 (defun succ-category-p (cc)
-  (typep (class-category-category cc) 'succ-category))
+  (typep (cc-category cc) 'succ-category))
 
 (defun pred-category-p (cc)
-  (typep (class-category-category cc) 'pred-category))
+  (typep (cc-category cc) 'pred-category))
 
 (defun functor-category-p (cc)
-  (typep (class-category-category cc) 'functor-category))
+  (typep (cc-category cc) 'functor-category))
 
 (defun =-functor-category-p (cc)
-  (typep (class-category-category cc) '=-functor-category))
+  (typep (cc-category cc) '=-functor-category))
 
 (defun >-functor-category-p (cc)
-  (typep (class-category-category cc) '>-functor-category))
+  (typep (cc-category cc) '>-functor-category))
 
 (defun <-functor-category-p (cc)
-  (typep (class-category-category cc) '<-functor-category))
+  (typep (cc-category cc) '<-functor-category))
+
+(defun order-functor-category-p (cc)
+  (typep (cc-category cc) 'order-functor-category))
 
 (defun +-functor-category-p (cc)
-  (typep (class-category-category cc) '+-functor-category))
+  (typep (cc-category cc) '+-functor-category))
 
 (defun succ-functor-category-p (cc)
-  (typep (class-category-category cc) 'succ-functor-category))
+  (typep (cc-category cc) 'succ-functor-category))
 
 (defun pred-functor-category-p (cc)
-  (typep (class-category-category cc) 'pred-functor-category))
+  (typep (cc-category cc) 'pred-functor-category))

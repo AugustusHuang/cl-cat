@@ -44,15 +44,91 @@
     ;; CATEGORY will be an object of subclass of NONE-CATEGORY.
     (category (make-instance 'none-category))))
 
+(defmacro cc-class (cc)
+  `(class-category-class cc))
+
+(defmacro cc-category (cc)
+  `(class-category-category cc))
+
+(defmacro with-gensyms ((&rest names) &body body)
+  `(let ,(loop for i in names collect `(,i (gensym)))
+     ,@body))
+
 ;;; DEFCATEGORY macro, will define the corresponding class of category and
 ;;; if given related function, initialize with given function, or just use
 ;;; slot-wise lexicographic default function.
-(defmacro defcategory (class category &optional args)
-  ()
-  ;; In CLTL it's mentioned that the macro-expander should not perform
-  ;; the side-effects, so definition of the category-object will be here.
-  `(eval-when (:compile-toplevel :load-toplevel :execute)
-     ))
+(defmacro defcategory (class category &rest args)
+  (with-gensyms (class-object category-instance)
+    `(let ((,class-object (find-class ,class))
+	   (,category-instance nil))
+       (case ,category
+	 ('none-category (setf ,category-instance
+			       (make-none-category)))
+	 ('=-category (setf ,category-instance
+			    (make-=-category (first ,args))))
+	 ('>-category (setf ,category-instance
+			    (make->-category (first ,args))))
+	 ('<-category (setf ,category-instance
+			    (make-<-category (first ,args))))
+	 ('order-category (setf ,category-instance
+				(make-order-category (first ,args)
+						     (second ,args)
+						     (third ,args))))
+	 ('+-category (setf ,category-instance
+			    (make-+-category (first ,args)
+					     (second ,args)
+					     (third ,args))))
+	 ('succ-category (setf ,category-instance
+			       (make-succ-category (first ,args)
+						   (second ,args))))
+	 ('pred-category (setf ,category-instance
+			       (make-pred-category (first ,args)
+						   (second ,args))))
+	 ('functor-category (setf ,category-instance
+				  (make-functor-category (first ,args)
+							 (second ,args))))
+	 ('=-functor-category (setf ,category-instance
+				    (make-=-functor-category (first ,args)
+							     (second ,args)
+							     (third ,args))))
+	 ('>-functor-category (setf ,category-instance
+				    (make->-functor-category (first ,args)
+							     (second ,args)
+							     (third ,args))))
+	 ('<-functor-category (setf ,category-instance
+				    (make-<-functor-category (first ,args)
+							     (second ,args)
+							     (third ,args))))
+	 ('order-functor-category (setf ,category-instance
+					(make-order-functor-category
+					 (first ,args)
+					 (second ,args)
+					 (third ,args)
+					 (fourth ,args)
+					 (fifth ,args))))
+	 ('+-functor-category (setf ,category-instance
+				    (make-+-functor-category (first ,args)
+							     (second ,args)
+							     (third ,args))))
+	 ('succ-functor-category (setf ,category-instance
+				       (make-succ-functor-category
+					(first ,args)
+					(second ,args)
+					(third ,args))))
+	 ('pred-functor-category (setf ,category-instance
+				       (make-pred-functor-category
+					(first ,args)
+					(second ,args)
+					(third ,args))))
+	 (otherwise (setf ,category-instance
+			  (make-instance ,category args))))
+       ;; In CLTL it's mentioned that the macro-expander should not perform
+       ;; the side-effects.
+       `(eval-when (:compile-toplevel :load-toplevel :execute)
+	  (make-class-category ,class-object ,category-instance)
+	  ;; TODO: Then define the methods to be the formal interface
+	  ;; of our usage...
+	  ))))
 
 (defun make-none-category ()
   (make-instance 'none-category))
@@ -65,6 +141,12 @@
 
 (defun make-<-category (<-func)
   (make-instance '<-category :<-function <-func))
+
+(defun make-order-category (=-func >-func <-func)
+  (make-instance 'order-category
+		 :=-function =-func
+		 :>-function >-func
+		 :<-function <-func))
 
 (defun make-+-category (+-func n-inf p-inf)
   (make-instance '+-category
@@ -101,6 +183,14 @@
 
 (defun make-<-functor-category (<-func dom codom)
   (make-instance '<-functor-category
+		 :<-function <-func
+		 :domain dom
+		 :codomain codom))
+
+(defun make-order-functor-category (=-func >-func <-func dom codom)
+  (make-instance 'order-functor-category
+		 :=-function =-func
+		 :>-function >-func
 		 :<-function <-func
 		 :domain dom
 		 :codomain codom))
