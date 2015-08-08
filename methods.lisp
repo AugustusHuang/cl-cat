@@ -26,31 +26,31 @@
 ;;; Generic and concrete inner-category methods.
 ;;; FIXME: Choose a proper name...
 
-(defgeneric =-generic (category class a b)
+(defgeneric =-generic (a b)
   (:documentation
    "Generic function of =."))
 
-(defgeneric >-generic (category class a b)
+(defgeneric >-generic (a b)
   (:documentation
    "Generic function of >."))
 
-(defgeneric <-generic (category class a b)
+(defgeneric <-generic (a b)
   (:documentation
    "Generic function of <."))
 
-(defgeneric +-generic (category class a b)
+(defgeneric +-generic (a b)
   (:documentation
    "Generic function of +."))
 
-(defgeneric succ-generic (category class a b)
+(defgeneric succ-generic (a)
   (:documentation
    "Generic function of successor."))
 
-(defgeneric pred-generic (category class a b)
+(defgeneric pred-generic (a)
   (:documentation
    "Generic function of predecessor."))
 
-(defgeneric functor-generic (category class a b)
+(defgeneric functor-generic (fa fb)
   (:documentation
    "Generic functor."))
 

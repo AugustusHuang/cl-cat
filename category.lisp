@@ -76,14 +76,28 @@
 						     (third ,args))))
 	 ('+-category (setf ,category-instance
 			    (make-+-category (first ,args)
-					     (second ,args)
-					     (third ,args))))
+					     (second ,args))))
+	 ('finite-+-category (setf ,category-instance
+				   (make-finite-+-category (first ,args)
+							   (second ,args)
+							   (third ,args)
+							   (fourth ,args))))
+	 ('mod-+-category (setf ,category-instance
+				(make-mod-+-category (first ,args)
+						     (second ,args)
+						     (third ,args))))
 	 ('succ-category (setf ,category-instance
 			       (make-succ-category (first ,args)
-						   (second ,args))))
+						   (second ,args)
+						   (third ,args)
+						   (fourth ,args)
+						   (fifth ,args))))
 	 ('pred-category (setf ,category-instance
 			       (make-pred-category (first ,args)
-						   (second ,args))))
+						   (second ,args)
+						   (third ,args)
+						   (fourth ,args)
+						   (fifth ,args))))
 	 ('functor-category (setf ,category-instance
 				  (make-functor-category (first ,args)
 							 (second ,args))))
@@ -108,27 +122,44 @@
 					 (fifth ,args))))
 	 ('+-functor-category (setf ,category-instance
 				    (make-+-functor-category (first ,args)
-							     (second ,args)
-							     (third ,args))))
+							     (second ,args))))
+	 ('finite-+-functor-category (setf ,category-instance
+					   (make-finite-+-functor-category
+					    (first ,args)
+					    (second ,args)
+					    (third ,args)
+					    (fourth ,args)
+					    (fifth ,args)
+					    (sixth ,args))))
+	 ('mod-+-functor-category (setf ,category-instance
+					(make-mod-+-functor-category
+					 (first ,args)
+					 (second ,args)
+					 (third ,args)
+					 (fourth ,args)
+					 (fifth ,args))))
 	 ('succ-functor-category (setf ,category-instance
 				       (make-succ-functor-category
 					(first ,args)
 					(second ,args)
-					(third ,args))))
+					(third ,args)
+					(fourth ,args)
+					(fifth ,args)
+					(sixth ,args))))
 	 ('pred-functor-category (setf ,category-instance
 				       (make-pred-functor-category
 					(first ,args)
 					(second ,args)
-					(third ,args))))
+					(third ,args)
+					(fourth ,args)
+					(fifth ,args)
+					(sixth ,args))))
 	 (otherwise (setf ,category-instance
 			  (make-instance ,category args))))
        ;; In CLTL it's mentioned that the macro-expander should not perform
        ;; the side-effects.
        `(eval-when (:compile-toplevel :load-toplevel :execute)
-	  (make-class-category ,class-object ,category-instance)
-	  ;; TODO: Then define the methods to be the formal interface
-	  ;; of our usage...
-	  ))))
+	  (make-class-category ,class-object ,category-instance)))))
 
 (defun make-none-category ()
   (make-instance 'none-category))
@@ -148,19 +179,37 @@
 		 :>-function >-func
 		 :<-function <-func))
 
-(defun make-+-category (+-func n-inf p-inf)
+(defun make-+-category (+-func id)
   (make-instance '+-category
 		 :+-function +-func
-		 :n-infinitum n-inf
-		 :p-infinitum p-inf))
+		 :identity id))
 
-(defun make-succ-category (succ-func inf)
+(defun make-finite-+-category (+-func id n-inf p-inf)
+  (make-instance 'finite-+-category
+		 :+-function +-func
+		 :identity id
+		 :negative-infinitum n-inf
+		 :positive-infinitum p-inf))
+
+(defun make-mod-+-category (+-func id mod)
+  (make-instance 'mod-+-category
+		 :+-function +-func
+		 :identity id
+		 :modulus mod))
+
+(defun make-succ-category (=-func >-func <-func succ-func inf)
   (make-instance 'succ-category
+		 :=-function =-func
+		 :>-function >-func
+		 :<-function <-func
 		 :succ succ-func
 		 :infinitum inf))
 
-(defun make-pred-category (pred-func inf)
+(defun make-pred-category (=-func >-func <-func pred-func inf)
   (make-instance 'pred-category
+		 :=-function =-func
+		 :>-function >-func
+		 :<-function <-func
 		 :pred pred-func
 		 :infinitum inf))
 
@@ -169,50 +218,71 @@
 		 :domain dom
 		 :codomain codom))
 
-(defun make-=-functor-category (=-func dom codom)
+(defun make-=-functor-category (dom codom =-func)
   (make-instance '=-functor-category
-		 :=-function =-func
 		 :domain dom
-		 :codomain codom))
+		 :codomain codom
+		 :=-function =-func))
 
-(defun make->-functor-category (>-func dom codom)
+(defun make->-functor-category (dom codom >-func)
   (make-instance '>-functor-category
-		 :>-function >-func
 		 :domain dom
-		 :codomain codom))
+		 :codomain codom
+		 :>-function >-func))
 
-(defun make-<-functor-category (<-func dom codom)
+(defun make-<-functor-category (dom codom <-func)
   (make-instance '<-functor-category
-		 :<-function <-func
 		 :domain dom
-		 :codomain codom))
+		 :codomain codom
+		 :<-function <-func))
 
-(defun make-order-functor-category (=-func >-func <-func dom codom)
+(defun make-order-functor-category (dom codom =-func >-func <-func)
   (make-instance 'order-functor-category
+		 :domain dom
+		 :codomain codom
 		 :=-function =-func
 		 :>-function >-func
-		 :<-function <-func
-		 :domain dom
-		 :codomain codom))
+		 :<-function <-func))
 
-(defun make-+-functor-category (+-func dom codom)
+(defun make-+-functor-category (dom codom +-func id)
   (make-instance '+-functor-category
+		 :domain dom
+		 :codomain codom
 		 :+-function +-func
-		 :domain dom
-		 :codomain codom))
+		 :identity id))
 
-(defun make-succ-functor-category (succ-func dom codom)
+(defun make-finite-+-functor-category (dom codom +-func id n-inf p-inf)
+  (make-instance 'finite-+-functor-category
+		 :domain dom
+		 :codomain codom
+		 :+-function +-func
+		 :identity id
+		 :negative-infinitum n-inf
+		 :positive-infinitum p-inf))
+
+(defun make-mod-+-functor-category (dom codom +-func id mod)
+  (make-instance 'mod-+-functor-category
+		 :domain dom
+		 :codomain codom
+		 :+-function +-func
+		 :identity id
+		 :modulus mod))
+
+(defun make-succ-functor-category (dom codom succ-func =-func >-func <-func)
   (make-instance 'succ-functor-category
+		 :domain dom
+		 :codomain codom
 		 :succ succ-func
-		 :domain dom
-		 :codomain codom))
+		 :=-function =-func
+		 :>-function >-func
+		 :<-function <-func))
 
-(defun make-pred-functor-category (pred-func dom codom)
+(defun make-pred-functor-category (dom codom pred-func =-func >-func <-func)
   (make-instance 'pred-functor-category
-		 :pred pred-func
 		 :domain dom
-		 :codomain codom))
+		 :codomain codom
+		 :pred pred-func
+		 :=-function =-func
+		 :>-function >-func
+		 :<-function <-func))
 
-;;; Those pre-defined useful categories should be loaded to form the basis
-;;; of user designs, of course user can define their own without the basis.
-;;; Also, I will make a compactified version of standard type system.

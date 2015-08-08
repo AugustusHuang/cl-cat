@@ -102,15 +102,28 @@
   ((+-function
     :initarg :+-function
     :reader +-function)
-   ;; If the ADD function operate on a finite field (or interval) ...
-   (negative-infinitum
+   (identity-element
+    :initarg :identity
+    :reader identity-element))
+  (:documentation
+   "A category with function to add two objects together, the sum of which is also an valid object in this category."))
+
+(defclass finite-+-category (+-category)
+  ((negative-infinitum
     :initarg :n-infinitum
     :reader negative-infinitum)
    (positive-infinitum
     :initarg :p-infinitum
     :reader positive-infinitum))
   (:documentation
-   "A category with function to add together two objects, the sum of which is also an valid object in this category."))
+   "A category with function to add two objects together, objects have a lower/upper limit."))
+
+(defclass mod-+-category (+-category)
+  ((modulus
+    :initarg :modulus
+    :reader modulus))
+  (:documentation
+   "A category with function to add two objects together, and objects act like a finite field."))
 
 ;;; FIXME: How about --categories? Add zero divisors and we are done?
 
@@ -170,6 +183,16 @@
   ()
   (:documentation
    "A functor category in which the sum of functors is also a functor in this category."))
+
+(defclass finite-+-functor-category (functor-category finite-+-category)
+  ()
+  (:documentation
+   "A functor category in which the sum of functors is also a functor in this finite category."))
+
+(defclass mod-+-functor-category (functor-category mod-+-category)
+  ()
+  (:documentation
+   "A functor category in which the sum of functors is also a functor in this finite field like category."))
 
 (defclass succ-functor-category (functor-category succ-category)
   ()

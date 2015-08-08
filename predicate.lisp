@@ -28,6 +28,8 @@
 		 >-category-p
 		 <-category-p
 		 +-category-p
+		 finite-+-category-p
+		 mod-+-category-p
 		 succ-category-p
 		 pred-category-p
 		 functor-category-p
@@ -35,6 +37,8 @@
 		 >-functor-category-p
 		 <-functor-category-p
 		 +-functor-category-p
+		 finite-+-functor-category-p
+		 mod-+-functor-category-p
 		 succ-functor-category-p
 		 pred-functor-category-p))
 
@@ -55,6 +59,12 @@
 
 (defun +-category-p (cc)
   (typep (cc-category cc) '+-category))
+
+(defun finite-+-category-p (cc)
+  (typep (cc-category cc) 'finite-+-category))
+
+(defun mod-+-category-p (cc)
+  (typep (cc-category cc) 'mod-+-category))
 
 (defun succ-category-p (cc)
   (typep (cc-category cc) 'succ-category))
@@ -79,6 +89,12 @@
 
 (defun +-functor-category-p (cc)
   (typep (cc-category cc) '+-functor-category))
+
+(defun finite-+-functor-category-p (cc)
+  (typep (cc-category cc) 'finite-+-functor-category))
+
+(defun mod-+-functor-category-p (cc)
+  (typep (cc-category cc) 'mod-+-functor-category))
 
 (defun succ-functor-category-p (cc)
   (typep (cc-category cc) 'succ-functor-category))
