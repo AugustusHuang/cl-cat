@@ -23,9 +23,12 @@
 
 (in-package :cl-cat)
 
-;;; Different built-in types.
+;;; Default lower (0 and 1)-categories.
+;;; NOTE: Here N-category means objects are in level N. e.g. 0-category has
+;;; 0-objects and 1-functions (that is, normal OBJECTs and FUNCTIONs).
 (deftype built-in-category ()
   '(member
+    ;; 0-categories
     :none-category
     :=-category
     :>-category
@@ -36,6 +39,18 @@
     :order-category
     :succ-category
     :pred-category
+    ;; 1-categories
+    :function-category
+    :=-function-category
+    :>-function-category
+    :<-function-category
+    :+-function-category
+    :finite-+-function-category
+    :mod-+-function-category
+    :order-function-category
+    :succ-function-category
+    :pred-function-category
+    ;; 2-categories
     :functor-category
     :=-functor-category
     :>-functor-category
@@ -47,40 +62,53 @@
     :succ-functor-category
     :pred-functor-category))
 
+;;; Do we need this?
 (defmacro with-gensyms ((&rest names) &body body)
   `(let ,(loop for i in names collect `(,i (gensym)))
      ,@body))
 
 ;;; DEFCATEGORY macro, will define the corresponding class of category and
 ;;; if given related function, initialize with given function.
-;;; CLASS-NAME and CATEGORY-NAME are symbols.
+;;; CLASS-NAME and CATEGORY-NAME are symbols of class and category.
+(defun category-name (class-symbol category-symbol)
+  (let* ((package (symbol-package class-symbol))
+	 (prefix (symbol-name class-symbol))
+	 (suffix (ecase category-symbol
+		   (:none-category "-NONE")
+		   (:=-category "-=")
+		   (:>-category "->")
+		   (:<-category "-<")
+		   (:+-category "-+")
+		   (:finite-+-category "-FINITE-+")
+		   (:mod-+-category "-MOD-+")
+		   (:order-category "-ORDER")
+		   (:succ-category "-SUCC")
+		   (:pred-category "-PRED")
+		   (:function-category "-FUNCTION")
+		   (:=-function-category "-=-FUNCTION")
+		   (:>-function-category "->-FUNCTION")
+		   (:<-function-category "-<-FUNCTION")
+		   (:+-function-category "-+-FUNCTION")
+		   (:finite-+-function-category "-FINITE-+-FUNCTION")
+		   (:mod-+-function-category "-MOD-+-FUNCTION")
+		   (:order-function-category "-ORDER-FUNCTION")
+		   (:succ-function-category "-SUCC-FUNCTION")
+		   (:pred-function-category "-PRED-FUNCTION")
+		   (:functor-category "-FUNCTOR")
+		   (:=-functor-category "-=-FUNCTOR")
+		   (:>-functor-category "->-FUNCTOR")
+		   (:<-functor-category "-<-FUNCTOR")
+		   (:+-functor-category "-+-FUNCTOR")
+		   (:finite-+-functor-category "-FINITE-+-FUNCTOR")
+		   (:mod-+-functor-category "-MOD-+-FUNCTOR")
+		   (:order-functor-category "-ORDER-FUNCTOR")
+		   (:succ-functor-category "-SUCC-FUNCTOR")
+		   (:pred-functor-category "-PRED-FUNCTOR"))))
+    ;; FIXME: Where to INTERN? Current package or CL-USER?
+    (intern (concatenate 'string prefix suffix) package)))
+
 (defmacro defcategory (class-symbol category-symbol)
-  (flet ((category-name (class-symbol category-symbol)
-	   (let* ((prefix (symbol-name class-symbol))
-		  (suffix (ecase category-symbol
-			    (:none-category "-NONE")
-			    (:=-category "-=")
-			    (:>-category "->")
-			    (:<-category "-<")
-			    (:+-category "-+")
-			    (:finite-+-category "-FINITE-+")
-			    (:mod-+-category "-MOD-+")
-			    (:order-category "-ORDER")
-			    (:succ-category "-SUCC")
-			    (:pred-category "-PRED")
-			    (:functor-category "-FUNCTOR")
-			    (:=-functor-category "-=-FUNCTOR")
-			    (:>-functor-category "->-FUNCTOR")
-			    (:<-functor-category "-<-FUNCTOR")
-			    (:+-functor-category "-+-FUNCTOR")
-			    (:finite-+-functor-category "-FINITE-+-FUNCTOR")
-			    (:mod-+-functor-category "-MOD-+-FUNCTOR")
-			    (:order-functor-category "-ORDER-FUNCTOR")
-			    (:succ-functor-category "-SUCC-FUNCTOR")
-			    (:pred-functor-category "-PRED-FUNCTOR"))))
-	     ;; FIXME: Where to INTERN?
-	     (intern (concatenate 'string prefix suffix))))
-	 (category-slots (class-symbol category-symbol)
+  (flet ((category-slots (category-symbol)
 	   (ecase category-symbol
 	     (:none-category
 	      (list (list 'category
@@ -220,6 +248,207 @@
 			  :accessor 'pred)
 		    (list 'inf
 			  :type 'function
+			  :allocation :class
+			  :accessor 'infinitum)))
+	     (:function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate
+			  :initform 0)))
+	     (:=-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :=-function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '=-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '=-func)))
+	     (:>-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :>-function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '>-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '>-func)))
+	     (:<-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :<-function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '<-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '<-func)))
+	     (:+-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :+-function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '+-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '+-func)
+		    (list 'id
+			  :type class-symbol
+			  :allocation :class
+			  :accessor 'identity)))
+	     (:finite-+-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :finite-+-function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '+-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '+-func)
+		    (list 'id
+			  :type class-symbol
+			  :allocation :class
+			  :accessor 'identity)
+		    (list 'n-inf
+			  :type class-symbol
+			  :allocation :class
+			  :accessor 'negative-infinitum)
+		    (list 'p-inf
+			  :type class-symbol
+			  :allocation :class
+			  :accessor 'positive-infinitum)))
+	     (:mod-+-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :mod-+-function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '+-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '+-func)
+		    (list 'id
+			  :type class-symbol
+			  :allocation :class
+			  :accessor 'identity)
+		    (list 'mod
+			  :type class-symbol
+			  :allocation :class
+			  :accessor 'modulus)))
+	     (:order-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :order-nfunction-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '=-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '=-func)
+		    (list '>-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '>-func)
+		    (list '<-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '<-func)))
+	     (:succ-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :succ-function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '=-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '=-func)
+		    (list '>-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '>-func)
+		    (list '<-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '<-func)
+		    (list 'succ
+			  :type 'function
+			  :allocation :class
+			  :accessor 'succ)
+		    (list 'inf
+			  :type class-symbol
+			  :allocation :class
+			  :accessor 'infinitum)))
+	     (:pred-function-category
+	      (list (list 'category
+			  :allocation :class
+			  :initform :pred-function-category)
+		    (list 'lambda
+			  :type 'function
+			  :allocation :class
+			  :accessor 'func)
+		    (list 'ate
+			  :accessor 'ate)
+		    (list '=-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '=-func)
+		    (list '>-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '>-func)
+		    (list '<-func
+			  :type 'function
+			  :allocation :class
+			  :accessor '<-func)
+		    (list 'pred
+			  :type 'function
+			  :allocation :class
+			  :accessor 'pred)
+		    (list 'inf
+			  :type class-symbol
 			  :allocation :class
 			  :accessor 'infinitum)))
 	     (:functor-category
@@ -436,10 +665,9 @@
 			  :accessor 'pred))))))
     ;; We are facing what defined by ourselves...
     ;; TODO: Use CASE instead of ECASE?
-    `(defclass ,(category-name class-symbol category-symbol) (class-symbol)
-       ,(category-slots class-symbol category-symbol))))
+    `(defclass ,(category-name class-symbol category-symbol) (,class-symbol)
+       ,(category-slots category-symbol))))
 
-;;; MAKE-OBJECT is a upper-abstraction of MAKE-INSTANCE, it returns a new
-;;; instance which obey the category rule.
-;;; TODO: Do we need this exactly?
-
+;;; FIND-CATEGORY is a wrapper of FIND-CLASS...
+(defun find-category (class-symbol category-symbol)
+  (find-class (category-name class-symbol category-symbol)))

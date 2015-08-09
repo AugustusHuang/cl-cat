@@ -23,7 +23,7 @@
 
 (in-package :cl-cat)
 
-(declare (inline none-category-p
+(declaim (inline none-category-p
 		 =-category-p
 		 >-category-p
 		 <-category-p
@@ -33,7 +33,16 @@
 		 order-category-p
 		 succ-category-p
 		 pred-category-p
-		 functor-category-p
+		 function-category-p
+		 =-function-category-p
+		 >-function-category-p
+		 <-function-category-p
+		 +-function-category-p
+		 finite-+-function-category-p
+		 mod-+-function-category-p
+		 order-function-category-p
+		 succ-function-category-p
+		 pred-functor-category-p
 		 =-functor-category-p
 		 >-functor-category-p
 		 <-functor-category-p
@@ -73,6 +82,36 @@
 
 (defun pred-category-p (cc)
   (eql (category cc) :pred-category))
+
+(defun function-category-p (cc)
+  (eql (category cc) :function-category))
+
+(defun =-function-category-p (cc)
+  (eql (category cc) :=-function-category))
+
+(defun >-function-category-p (cc)
+  (eql (category cc) :>-function-category))
+
+(defun <-function-category-p (cc)
+  (eql (category cc) :<-function-category))
+
+(defun +-function-category-p (cc)
+  (eql (category cc) :+-function-category))
+
+(defun finite-+-function-category-p (cc)
+  (eql (category cc) :finite-+-function-category))
+
+(defun mod-+-function-category-p (cc)
+  (eql (category cc) :mod-+-function-category))
+
+(defun order-function-category-p (cc)
+  (eql (category cc) :order-function-category))
+
+(defun succ-function-category-p (cc)
+  (eql (category cc) :succ-function-category))
+
+(defun pred-function-category-p (cc)
+  (eql (category cc) :pred-function-category))
 
 (defun functor-category-p (cc)
   (eql (category cc) :functor-category))

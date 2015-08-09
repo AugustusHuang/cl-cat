@@ -33,4 +33,5 @@
    (:static-file "README.md")
    (:file "packages")
    (:file "category" :depends-on ("packages"))
+   (:file "object" :depends-on ("packages" "category"))
    (:file "predicate" :depends-on ("packages" "category"))))

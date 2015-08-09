@@ -44,6 +44,26 @@
    :succ-category-p
    :pred-category
    :pred-category-p
+   :function-category
+   :function-category-p
+   :=-function-category
+   :=-function-category-p
+   :>-function-category
+   :>-function-category-p
+   :<-function-category
+   :<-function-category-p
+   :+-function-category
+   :+-function-category-p
+   :finite-+-function-category
+   :finite-+-function-category-p
+   :mod-+-function-category
+   :mod-+-function-category-p
+   :order-function-category
+   :order-function-category-p
+   :succ-function-category
+   :succ-function-category-p
+   :pred-function-category
+   :pred-function-category-p
    :functor-category
    :functor-category-p
    :=-functor-category
@@ -63,8 +83,17 @@
    :pred-functor-category
    :pred-functor-category-p
    :defcategory
-   :defcategory-func
-   :make-object))
+   :find-category
+   :make-none-object
+   :make-=-object
+   :make->-object
+   :make-<-object
+   :make-+-object
+   :make-finite-+-object
+   :make-mod-+-object
+   :make-order-object
+   :make-succ-object
+   :make-pred-object))
 
 (defpackage :cl-cat-test
   (:use :cl
