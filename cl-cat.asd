@@ -21,6 +21,8 @@
 ;;;; ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ;;;; OTHER DEALINGS IN THE SOFTWARE.
 
+(in-package :asdf-user)
+
 (defsystem :cl-cat
   :version "0.0.0"
   :licence "MIT"
@@ -30,7 +32,5 @@
   ((:static-file "LICENSE")
    (:static-file "README.md")
    (:file "packages")
-   (:file "class" :depends-on ("packages"))
-   (:file "category" :depends-on ("packages" "class"))
-   (:file "methods" :depends-on ("packages" "class"))
-   (:file "predicate" :depends-on ("packages" "class" "category"))))
+   (:file "category" :depends-on ("packages"))
+   (:file "predicate" :depends-on ("packages" "category"))))

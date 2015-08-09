@@ -63,7 +63,8 @@
    :pred-functor-category
    :pred-functor-category-p
    :defcategory
-   :defcategory-func))
+   :defcategory-func
+   :make-object))
 
 (defpackage :cl-cat-test
   (:use :cl

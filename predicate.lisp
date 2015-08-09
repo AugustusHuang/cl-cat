@@ -30,6 +30,7 @@
 		 +-category-p
 		 finite-+-category-p
 		 mod-+-category-p
+		 order-category-p
 		 succ-category-p
 		 pred-category-p
 		 functor-category-p
@@ -39,65 +40,67 @@
 		 +-functor-category-p
 		 finite-+-functor-category-p
 		 mod-+-functor-category-p
+		 order-functor-category-p
 		 succ-functor-category-p
 		 pred-functor-category-p))
 
 (defun none-category-p (cc)
-  (typep (cc-category cc) 'none-category))
+  (eql (category cc) :none-category))
 
 (defun =-category-p (cc)
-  (typep (cc-category cc) '=-category))
+  (eql (category cc) :=-category))
 
 (defun >-category-p (cc)
-  (typep (cc-category cc) '>-category))
+  (eql (category cc) :>-category))
 
 (defun <-category-p (cc)
-  (typep (cc-category cc) '<-category))
+  (eql (category cc) :<-category))
 
 (defun order-category-p (cc)
-  (typep (cc-category cc) 'order-category))
+  (eql (category cc) :order-category))
 
 (defun +-category-p (cc)
-  (typep (cc-category cc) '+-category))
+  (eql (category cc) :+-category))
 
 (defun finite-+-category-p (cc)
-  (typep (cc-category cc) 'finite-+-category))
+  (eql (category cc) :finite-+-category))
 
 (defun mod-+-category-p (cc)
-  (typep (cc-category cc) 'mod-+-category))
+  (eql (category cc) :mod-+-category))
 
 (defun succ-category-p (cc)
-  (typep (cc-category cc) 'succ-category))
+  (eql (category cc) :succ-category))
 
 (defun pred-category-p (cc)
-  (typep (cc-category cc) 'pred-category))
+  (eql (category cc) :pred-category))
 
 (defun functor-category-p (cc)
-  (typep (cc-category cc) 'functor-category))
+  (eql (category cc) :functor-category))
 
 (defun =-functor-category-p (cc)
-  (typep (cc-category cc) '=-functor-category))
+  (eql (category cc) :=-functor-category))
 
 (defun >-functor-category-p (cc)
-  (typep (cc-category cc) '>-functor-category))
+  (eql (category cc) :>-functor-category))
 
 (defun <-functor-category-p (cc)
-  (typep (cc-category cc) '<-functor-category))
+  (eql (category cc) :<-functor-category))
 
 (defun order-functor-category-p (cc)
-  (typep (cc-category cc) 'order-functor-category))
+  (eql (category cc) :order-functor-category))
 
 (defun +-functor-category-p (cc)
-  (typep (cc-category cc) '+-functor-category))
+  (eql (category cc) :+-functor-category))
 
 (defun finite-+-functor-category-p (cc)
-  (typep (cc-category cc) 'finite-+-functor-category))
+  (eql (category cc) :finite-+-functor-category))
 
 (defun mod-+-functor-category-p (cc)
-  (typep (cc-category cc) 'mod-+-functor-category))
+  (eql (category cc) :mod-+-functor-category))
 
 (defun succ-functor-category-p (cc)
-  (typep (cc-category cc) 'succ-functor-category))
+  (eql (category cc) :succ-functor-category))
 
 (defun pred-functor-category-p (cc)
-  (typep (cc-category cc) 'pred-functor-category))
+  (eql (category cc) :pred-functor-category))
+
