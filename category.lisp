@@ -44,11 +44,13 @@
     ;; CATEGORY will be an object of subclass of NONE-CATEGORY.
     (category (make-instance 'none-category))))
 
-(defmacro cc-class (cc)
-  `(class-category-class cc))
+(declare (inline cc-class))
+(defun cc-class (cc)
+  (class-category-class cc))
 
-(defmacro cc-category (cc)
-  `(class-category-category cc))
+(declare (inline cc-category))
+(defun cc-category (cc)
+  (class-category-category cc))
 
 (defmacro with-gensyms ((&rest names) &body body)
   `(let ,(loop for i in names collect `(,i (gensym)))
@@ -159,7 +161,8 @@
        ;; In CLTL it's mentioned that the macro-expander should not perform
        ;; the side-effects.
        `(eval-when (:compile-toplevel :load-toplevel :execute)
-	  (make-class-category ,class-object ,category-instance)))))
+	  (make-class-category :class ,class-object
+			       :category ,category-instance)))))
 
 (defun make-none-category ()
   (make-instance 'none-category))

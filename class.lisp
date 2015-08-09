@@ -69,7 +69,7 @@
 (defclass =-category (none-category)
   ((=-function
     :initarg :=-function
-    :reader =-function))
+    :accessor =-function))
   (:documentation
    "A category with function to test whether two objects are = or not."))
 
@@ -77,14 +77,14 @@
 (defclass >-category (none-category)
   ((>-function
     :initarg :>-function
-    :reader >-function))
+    :accessor >-function))
   (:documentation
    "A category with function to test whether an object is > than another."))
 
 (defclass <-category (none-category)
   ((<-function
     :initarg :<-function
-    :reader <-function))
+    :accessor <-function))
   (:documentation
    "A category with function to test whether an object is < than another."))
 
@@ -101,27 +101,27 @@
 (defclass +-category (none-category)
   ((+-function
     :initarg :+-function
-    :reader +-function)
+    :accessor +-function)
    (identity-element
     :initarg :identity
-    :reader identity-element))
+    :accessor identity-element))
   (:documentation
    "A category with function to add two objects together, the sum of which is also an valid object in this category."))
 
 (defclass finite-+-category (+-category)
   ((negative-infinitum
     :initarg :n-infinitum
-    :reader negative-infinitum)
+    :accessor negative-infinitum)
    (positive-infinitum
     :initarg :p-infinitum
-    :reader positive-infinitum))
+    :accessor positive-infinitum))
   (:documentation
    "A category with function to add two objects together, objects have a lower/upper limit."))
 
 (defclass mod-+-category (+-category)
   ((modulus
     :initarg :modulus
-    :reader modulus))
+    :accessor modulus))
   (:documentation
    "A category with function to add two objects together, and objects act like a finite field."))
 
@@ -132,30 +132,30 @@
 (defclass succ-category (order-category)
   ((succ-function
     :initarg :succ-function
-    :reader succ)
+    :accessor succ)
    (infinitum
     :initarg :infinitum
-    :reader infinitum))
+    :accessor infinitum))
   (:documentation
    "A category with function to get an object's successor, which is also a valid object in this category."))
 
 (defclass pred-category (order-category)
   ((pred-function
     :initarg :pred-function
-    :reader pred)
+    :accessor pred)
    (infinitum
     :initarg :infinitum
-    :reader infinitum))
+    :accessor infinitum))
   (:documentation
    "A category with function to get an object's predecessor, which is also a valid object in this category."))
 
 (defclass functor-category (none-category)
   ((domain-category
     :initarg :domain
-    :reader domain)
+    :accessor domain)
    (codomain-category
     :initarg :codomain
-    :reader codomain))
+    :accessor codomain))
   (:documentation
    "A category made up with functors map functions in one category to functions in another."))
 
