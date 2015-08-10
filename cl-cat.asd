@@ -26,8 +26,7 @@
 (defsystem :cl-cat
   :version "0.0.0"
   :licence "MIT"
-  :description ""
-  :long-description ""
+  :description "A category abstraction of CLOS."
   :components
   ((:static-file "LICENSE")
    (:static-file "README.md")
