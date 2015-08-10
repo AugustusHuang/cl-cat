@@ -82,6 +82,7 @@
    :succ-functor-category-p
    :pred-functor-category
    :pred-functor-category-p
+   :build-symbol
    :defcategory
    :find-category
    :make-none-object

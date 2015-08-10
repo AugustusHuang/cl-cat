@@ -62,612 +62,760 @@
     :succ-functor-category
     :pred-functor-category))
 
-;;; Do we need this?
-(defmacro with-gensyms ((&rest names) &body body)
-  `(let ,(loop for i in names collect `(,i (gensym)))
-     ,@body))
+(deftype built-in-category-short ()
+  '(member
+    :none-0 :=-0 :>-0 :<-0 :+-0 :finite-+-0 :mod-+-0 :order-0 :succ-0 :pred-0
+    :none-1 :=-1 :>-1 :<-1 :+-1 :finite-+-1 :mod-+-1 :order-1 :succ-1 :pred-1
+    :none-2 :=-2 :>-2 :<-2 :+-2 :finite-+-2 :mod-+-2 :order-2 :succ-2 :pred-2))
+
+;;; From The Common Lisp Cookbook...
+(defmacro build-symbol (&rest l)
+  (flet ((symstuff (l)
+	   `(concatenate 'string
+			 ,@(mapcar (lambda (x)
+				     (cond ((stringp x)
+					    `',x)
+					   ((atom x)
+					    `',(format nil "~A" x))
+					   ((eq (car x) ':<)
+					    `(format nil "~A" ,(cadr x)))
+					   (t
+					    `(format nil "~A" ,x))))
+				   l))))
+    (let ((p (find-if (lambda (x)
+			(and (consp x) (eq (car x) ':package)))
+		      l)))
+      (cond (p
+	     (setq l (remove p l))))
+      (let ((pkg (cond ((eq (cadr p) 'nil)
+			nil)
+		       (t
+			`(find-package ',(cadr p))))))
+	(cond (p
+	       (cond (pkg
+		      `(values (intern ,(symstuff l) ,pkg)))
+		     (t
+		      `(make-symbol ,(symstuff l)))))
+	      (t
+	       `(values (intern ,(symstuff l)))))))))
 
 ;;; DEFCATEGORY macro, will define the corresponding class of category and
 ;;; if given related function, initialize with given function.
 ;;; CLASS-NAME and CATEGORY-NAME are symbols of class and category.
-(defun category-name (class-symbol category-symbol)
-  (let* ((package (symbol-package class-symbol))
-	 (prefix (symbol-name class-symbol))
-	 (suffix (ecase category-symbol
-		   (:none-category "-NONE")
-		   (:=-category "-=")
-		   (:>-category "->")
-		   (:<-category "-<")
-		   (:+-category "-+")
-		   (:finite-+-category "-FINITE-+")
-		   (:mod-+-category "-MOD-+")
-		   (:order-category "-ORDER")
-		   (:succ-category "-SUCC")
-		   (:pred-category "-PRED")
-		   (:function-category "-FUNCTION")
-		   (:=-function-category "-=-FUNCTION")
-		   (:>-function-category "->-FUNCTION")
-		   (:<-function-category "-<-FUNCTION")
-		   (:+-function-category "-+-FUNCTION")
-		   (:finite-+-function-category "-FINITE-+-FUNCTION")
-		   (:mod-+-function-category "-MOD-+-FUNCTION")
-		   (:order-function-category "-ORDER-FUNCTION")
-		   (:succ-function-category "-SUCC-FUNCTION")
-		   (:pred-function-category "-PRED-FUNCTION")
-		   (:functor-category "-FUNCTOR")
-		   (:=-functor-category "-=-FUNCTOR")
-		   (:>-functor-category "->-FUNCTOR")
-		   (:<-functor-category "-<-FUNCTOR")
-		   (:+-functor-category "-+-FUNCTOR")
-		   (:finite-+-functor-category "-FINITE-+-FUNCTOR")
-		   (:mod-+-functor-category "-MOD-+-FUNCTOR")
-		   (:order-functor-category "-ORDER-FUNCTOR")
-		   (:succ-functor-category "-SUCC-FUNCTOR")
-		   (:pred-functor-category "-PRED-FUNCTOR"))))
-    ;; FIXME: Where to INTERN? Current package or CL-USER?
-    (intern (concatenate 'string prefix suffix) package)))
-
-(defmacro defcategory (class-symbol category-symbol)
+(defmacro defcategory (class-name category-symbol)
   (flet ((category-slots (category-symbol)
 	   (ecase category-symbol
-	     (:none-category
+	     (:none-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :none-category)))
-	     (:=-category
+			  :initform :none-category
+			  :reader 'category)))
+	     (:=-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :=-category)
+			  :initform :=-category
+			  :reader 'category)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)))
-	     (:>-category
+	     (:>-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :>-category)
+			  :initform :>-category
+			  :reader 'category)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)))
-	     (:<-category
+	     (:<-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :<-category)
+			  :initform :<-category
+			  :reader 'category)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)))
-	     (:+-category
+	     (:+-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :+-category)
+			  :initform :+-category
+			  :reader 'category)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)))
-	     (:finite-+-category
+			  :initarg :id
+			  :accessor 'id)))
+	     (:finite-+-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :finite-+-category)
+			  :initform :finite-+-category
+			  :reader 'category)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)
+			  :initarg :id
+			  :accessor 'id)
 		    (list 'n-inf
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :negative-infinitum
 			  :accessor 'negative-infinitum)
 		    (list 'p-inf
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :positive-infinitum
 			  :accessor 'positive-infinitum)))
-	     (:mod-+-category
+	     (:mod-+-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :mod-+-category)
+			  :initform :mod-+-category
+			  :reader 'category)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)
+			  :initarg :id
+			  :accessor 'id)
 		    (list 'mod
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :modulus
 			  :accessor 'modulus)))
-	     (:order-category
+	     (:order-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :order-category)
+			  :initform :order-category
+			  :reader 'category)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)))
-	     (:succ-category
+	     (:succ-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :succ-category)
+			  :initform :succ-category
+			  :reader 'category)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)
 		    (list 'succ
 			  :type 'function
 			  :allocation :class
+			  :initarg :succ
 			  :accessor 'succ)
 		    (list 'inf
-			  :type 'function
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :infinitum
 			  :accessor 'infinitum)))
-	     (:pred-category
+	     (:pred-0
 	      (list (list 'category
 			  :allocation :class
-			  :initform :pred-category)
+			  :initform :pred-category
+			  :reader 'category)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)
 		    (list 'pred
 			  :type 'function
 			  :allocation :class
+			  :initarg :pred
 			  :accessor 'pred)
 		    (list 'inf
-			  :type 'function
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :infinitum
 			  :accessor 'infinitum)))
-	     (:function-category
+	     (:none-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :function-category)
+			  :initform :function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
 			  :accessor 'ate
+			  :initarg :ate
 			  :initform 0)))
-	     (:=-function-category
+	     (:=-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :=-function-category)
+			  :initform :=-function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)))
-	     (:>-function-category
+	     (:>-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :>-function-category)
+			  :initform :>-function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)))
-	     (:<-function-category
+	     (:<-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :<-function-category)
+			  :initform :<-function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)))
-	     (:+-function-category
+	     (:+-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :+-function-category)
+			  :initform :+-function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)))
-	     (:finite-+-function-category
+			  :initarg :id
+			  :accessor 'id)))
+	     (:finite-+-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :finite-+-function-category)
+			  :initform :finite-+-function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)
+			  :initarg :id
+			  :accessor 'id)
 		    (list 'n-inf
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :negative-infinitum
 			  :accessor 'negative-infinitum)
 		    (list 'p-inf
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :positive-infinitum
 			  :accessor 'positive-infinitum)))
-	     (:mod-+-function-category
+	     (:mod-+-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :mod-+-function-category)
+			  :initform :mod-+-function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)
+			  :initarg :id
+			  :accessor 'id)
 		    (list 'mod
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :modulus
 			  :accessor 'modulus)))
-	     (:order-function-category
+	     (:order-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :order-nfunction-category)
+			  :initform :order-nfunction-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)))
-	     (:succ-function-category
+	     (:succ-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :succ-function-category)
+			  :initform :succ-function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)
 		    (list 'succ
 			  :type 'function
 			  :allocation :class
+			  :initarg :succ
 			  :accessor 'succ)
 		    (list 'inf
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :infinitum
 			  :accessor 'infinitum)))
-	     (:pred-function-category
+	     (:pred-1
 	      (list (list 'category
 			  :allocation :class
-			  :initform :pred-function-category)
+			  :initform :pred-function-category
+			  :reader 'category)
 		    (list 'lambda
 			  :type 'function
 			  :allocation :class
+			  :initarg :func
 			  :accessor 'func)
 		    (list 'ate
+			  :initarg :ate
 			  :accessor 'ate)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)
 		    (list 'pred
 			  :type 'function
 			  :allocation :class
+			  :initarg :pred
 			  :accessor 'pred)
 		    (list 'inf
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :infinitum
 			  :accessor 'infinitum)))
-	     (:functor-category
+	     (:none-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :functor-category)
+			  :initform :functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)))
-	     (:=-functor-category
+	     (:=-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :=-functor-category)
+			  :initform :=-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)))
-	     (:>-functor-category
+	     (:>-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :>-functor-category)
+			  :initform :>-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)))
-	     (:<-functor-category
+	     (:<-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :<-functor-category)
+			  :initform :<-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)))
-	     (:+-functor-category
+	     (:+-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :+-functor-category)
+			  :initform :+-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)))
-	     (:finite-+-functor-category
+			  :initarg :id
+			  :accessor 'id)))
+	     (:finite-+-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :finite-+-functor-category)
+			  :initform :finite-+-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)
+			  :initarg :id
+			  :accessor 'id)
 		    (list 'n-inf
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :negative-infinitum
 			  :accessor 'negative-infinitum)
 		    (list 'p-inf
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :positive-infinitum
 			  :accessor 'positive-infinitum)))
-	     (:mod-+-functor-category
+	     (:mod-+-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :mod-+-functor-category)
+			  :initform :mod-+-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '+-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :+-func
 			  :accessor '+-func)
 		    (list 'id
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
-			  :accessor 'identity)
+			  :initarg :id
+			  :accessor 'id)
 		    (list 'mod
-			  :type class-symbol
+			  :type 'class-name
 			  :allocation :class
+			  :initarg :modulus
 			  :accessor 'modulus)))
-	     (:order-functor-category
+	     (:order-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :order-functor-category)
+			  :initform :order-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)))
-	     (:succ-functor-category
+	     (:succ-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :succ-functor-category)
+			  :initform :succ-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)
 		    (list 'succ
 			  :type 'function
 			  :allocation :class
-			  :accessor 'succ)))
-	     (:pred-functor-category
+			  :initarg :succ
+			  :accessor 'succ)
+		    (list 'inf
+			  :type 'class-name
+			  :allocation :class
+			  :initarg :infinitum
+			  :accessor 'infinitum)))
+	     (:pred-2
 	      (list (list 'category
 			  :allocation :class
-			  :initform :pred-functor-category)
+			  :initform :pred-functor-category
+			  :reader 'category)
 		    (list 'dom
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :domain
 			  :accessor 'domain)
 		    (list 'cod
 			  :type 'symbol
 			  :allocation :class
+			  :initarg :codomain
 			  :accessor 'codomain)
 		    (list '=-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :=-func
 			  :accessor '=-func)
 		    (list '>-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :>-func
 			  :accessor '>-func)
 		    (list '<-func
 			  :type 'function
 			  :allocation :class
+			  :initarg :<-func
 			  :accessor '<-func)
 		    (list 'pred
 			  :type 'function
 			  :allocation :class
-			  :accessor 'pred))))))
+			  :initarg :pred
+			  :accessor 'pred)
+		    (list 'inf
+			  :type 'class-name
+			  :allocation :class
+			  :initarg :infinitum
+			  :accessor 'infinitum))))))
     ;; We are facing what defined by ourselves...
-    ;; TODO: Use CASE instead of ECASE?
-    `(defclass ,(category-name class-symbol category-symbol) (,class-symbol)
+    ;; We use short symbol here...
+    `(defclass ,(build-symbol (:< class-name) "-" (:< category-symbol)) ,(list class-name)
        ,(category-slots category-symbol))))
 
 ;;; FIND-CATEGORY is a wrapper of FIND-CLASS...
 (defun find-category (class-symbol category-symbol)
-  (find-class (category-name class-symbol category-symbol)))
+  (find-class (build-symbol (:< class-symbol) "-" (:< category-symbol))))
