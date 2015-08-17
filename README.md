@@ -14,7 +14,7 @@ or
 
     CL-USER> (require :cl-cat)
 
-if your Common Lisp environment support cl:require hook.
+if your Common Lisp environment support `cl:require` hook.
 
 ## Documentation
 See the doc/ directory.
