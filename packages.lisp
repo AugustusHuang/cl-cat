@@ -96,6 +96,12 @@
    :make-succ-object
    :make-pred-object))
 
+(defpackage :cl-cat-constraint
+  (:use :cl
+	:cl-cat)
+  (:documentation
+   "Constraint programming abstraction level of Common Lisp."))
+
 (defpackage :cl-cat-test
   (:use :cl
 	:cl-cat)

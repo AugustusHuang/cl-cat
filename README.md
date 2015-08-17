@@ -17,7 +17,7 @@ or
 if your Common Lisp environment support `cl:require` hook.
 
 ## Documentation
-See the doc/ directory.
+See the `doc/` directory.
 
 ## Test
 Load the test package:
